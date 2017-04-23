@@ -2,27 +2,55 @@
 - config:
     - testset: "Basic tests from Phone-Book API"
     - timeout: 100  # Increase timeout from the default 10 seconds
+
 - test: # Test api phone-book up
     - name: "Basic get request"
+    - group: "GET Requests"
+    - method: "GET"
     - url: "/"
-- test: # create todo by POST
-    - name: "Create todo"
-    - url: "/api/todos"
+    - expected_status: [200]
+    - validators:
+      - compare: {raw_body: "", comparator: contains, expected: '! :) :) API PHONE-BOOK UP :) :) !' }
+
+- test: # Test 404
+    - name: "Basic request 404"
+    - group: "GET Requests"
+    - method: "GET"
+    - url: "/test321"
+    - expected_status: [404]
+
+- test: # create full contact
+    - name: "Create full contact"
+    - group: "POST Requests"
     - method: "POST"
-    - body: '{"text": "teste api", "title": "teste"}'
+    - url: "/contacts"
     - headers: {Content-Type: application/json}
-- test: # create todo by PUT
-    - name: "Create/update todo"
-    - url: "/api/todos/1"
-    - method: "PUT"
-    - body: '{"text": "teste api put", "title": "teste PUT"}'
-    - headers: {Content-Type: 'application/json'}
-    - validators:  # This is how we do more complex testing!
-        - compare: {jsonpath_mini: 'text', expected: 'teste api put'}  # JSON extraction
-        - compare: {raw_body: "", comparator: contains, expected: 'api' }  # Tests on raw response
-- test:
-    - name: "Get single todo"
-    - url: "/api/todos/1"
-    - validators:  # This is how we do more complex testing!
-        - compare: {jsonpath_mini: 'text', expected: 'teste api put'}  # JSON extraction
-        - compare: {raw_body: "", comparator: contains, expected: 'api' }  # Tests on raw response
+    - body: '{"name": "testpyrest", "mobilephone": "0313199998888", "homephone": "0313133334444"}'
+    - expected_status: [201]
+    - validators:
+      - compare: {jsonpath_mini: "name", comparator: "eq", expected: "testpyrest"}
+      - compare: {jsonpath_mini: "mobilephone", comparator: "eq", expected: "0313199998888"}
+      - compare: {jsonpath_mini: "homephone", comparator: "eq", expected: "0313133334444"}
+
+- test: # create contact without homephone
+    - name: "Create contact"
+    - group: "POST Requests"
+    - method: "POST"
+    - url: "/contacts"
+    - headers: {Content-Type: application/json}
+    - body: '{"name": "tester", "mobilephone": "0314788889999"}'
+    - expected_status: [201]
+    - validators:
+      - compare: {jsonpath_mini: "name", comparator: "eq", expected: "tester"}
+      - compare: {jsonpath_mini: "mobilephone", comparator: "eq", expected: "0314788889999"}
+
+- test: # error create contact
+    - name: "error create contact "
+    - group: "POST Requests"
+    - method: "POST"
+    - url: "/contacts"
+    - headers: {Content-Type: application/json}
+    - body: '{"name": "tester"}'
+    - expected_status: [400]
+    - validators:
+      - compare: {raw_body: "", comparator: contains, expected: 'Missing required property: mobilephone' }

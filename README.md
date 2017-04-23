@@ -12,7 +12,7 @@ API Example on test - https://github.com/fredmoreira/phone-book
 
 #### Setup
 * git clone https://github.com/fredmoreira/demo-pyresttest
-* pip install
+* pip install -r requirements.txt
 
 #### Run
 
