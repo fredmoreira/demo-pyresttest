@@ -1,7 +1,6 @@
 ---
 - config:
     - testset: "Basic tests from Phone-Book API"
-    - timeout: 100  # Increase timeout from the default 10 seconds
 
 - test: # Test api phone-book up
     - name: "Basic get request"
